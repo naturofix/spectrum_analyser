@@ -7,11 +7,11 @@
 #define base 5 // digital pin for programming neopixels
 #define mid 6 // digital pin for programming neopixels
 #define treb 7 // digital pin for programming neopixels
-#define NUM_LEDS 50// this is the size of my neopixel strip           
+#define NUM_LEDS 300// this is the size of my neopixel strip           
 
 Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_LEDS, base, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(NUM_LEDS, mid, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(NUM_LEDS, treb, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(1, mid, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(1, treb, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel * stripArray[3] = {&base_strip, &mid_strip, &treb_strip};
 
 #define ADC_CHANNEL 0
@@ -215,7 +215,7 @@ void three_strand(int test){
       if(h < base_line){
         strip = 0;
         b = 0;
-        l = (strip_len/sound_bins/strips)*bin;
+        l = (strip_len/(sound_bins/strips))*bin;
         if(r > 0){
           r = r-n*bin;
           if(r < 0){
