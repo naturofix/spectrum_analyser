@@ -19,7 +19,7 @@
 #define base 5 // digital pin for programming neopixels
 #define mid 6 // digital pin for programming neopixels
 #define treb 7 // digital pin for programming neopixels
-#define NUM_LEDS 10// this is the size of my neopixel strip           
+#define NUM_LEDS 100// this is the size of my neopixel strip           
 
 Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_LEDS, base, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(NUM_LEDS, mid, NEO_GRB + NEO_KHZ800);
@@ -125,17 +125,18 @@ void setup() {
 
   // Neopixels setup
   // Initialize all pixels to 'off'
-  base_strip.setBrightness(255);
+  int brightness = 25;
+  base_strip.setBrightness(25);
   base_strip.begin(); // Initialize all pixels to 'off'
   cli();         // disable interrupts when writing neopixels   
   base_strip.show();
   sei();         // Enable interrupts
-  mid_strip.setBrightness(255);
+  mid_strip.setBrightness(25);
   mid_strip.begin(); // Initialize all pixels to 'off'
   cli();         // disable interrupts when writing neopixels   
   mid_strip.show();
   sei();         // Enable interrupts
-  treb_strip.setBrightness(255);
+  treb_strip.setBrightness(25);
   treb_strip.begin(); // Initialize all pixels to 'off'
   cli();         // disable interrupts when writing neopixels   
   treb_strip.show();
