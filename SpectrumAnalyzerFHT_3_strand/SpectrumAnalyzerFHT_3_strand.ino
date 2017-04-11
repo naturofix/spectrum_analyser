@@ -19,11 +19,11 @@
 #define base 5 // digital pin for programming neopixels
 #define mid 6 // digital pin for programming neopixels
 #define treb 7 // digital pin for programming neopixels
-#define NUM_PIXELS 10// this is the size of my neopixel strip           
+#define NUM_LEDS 10// this is the size of my neopixel strip           
 
-Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_PIXELS, base, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(NUM_PIXELS, mid, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(NUM_PIXELS, treb, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_LEDS, base, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(NUM_LEDS, mid, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(NUM_LEDS, treb, NEO_GRB + NEO_KHZ800);
 
 
 
@@ -135,10 +135,10 @@ void setup() {
   cli();         // disable interrupts when writing neopixels   
   mid_strip.show();
   sei();         // Enable interrupts
-  tre_strip.setBrightness(255);
-  tre_strip.begin(); // Initialize all pixels to 'off'
+  treb_strip.setBrightness(255);
+  treb_strip.begin(); // Initialize all pixels to 'off'
   cli();         // disable interrupts when writing neopixels   
-  tre_strip.show();
+  treb_strip.show();
   sei();         // Enable interrupts
 //  Serial.begin(9600);  // set up Serial library at 9600 bps for debugging purposes
 
@@ -155,11 +155,11 @@ void loop(){
   for(i=0; i<NUM_LEDS; i++) {
     base_strip.setPixelColor(i,255,0,0); 
     mid_strip.setPixelColor(i,0,255,0);
-    treb_stip.setPixelColor(i,0,0,255);
+    treb_strip.setPixelColor(i,0,0,255);
   }
-  strip_a.show();
-  strip_b.show();
-  strip_c.show();
+  base_strip.show();
+  mid_strip.show();
+  treb_strip.show();
 }
 
 //void loop() {
