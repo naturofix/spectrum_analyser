@@ -22,9 +22,6 @@
 #define NUM_PIXELS 300// this is the size of my neopixel strip           
 
 Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_PIXELS, base, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(NUM_PIXELS, mid, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(NUM_PIXELS, treb, NEO_GRB + NEO_KHZ800);
-
 
 
 // Microphone connects to Analog Pin 0.  Corresponding ADC channel number
@@ -99,7 +96,7 @@ static const uint32_t PROGMEM colors[NUM_COLORS] = {
 0x42, 0x1c37, 0x332e, 0x4823, 0x5b1a, 0x6c11, 0x7c08, 0x8c00, 0x88900, 0x108600, 0x178300, 0x1e8100, 0x267e00, 0x2d7b00, 0x347700, 0x3a7400, 0x407100, 0x466e00, 0x4d6b00, 0x526800, 0x586500, 0x5e6200, 0x636000, 0x685d00, 0x6d5a00, 0x725700, 0x775400, 0x7c5100, 0x804f00, 0x864c00, 0x8a4900, 0x8f4600, 0x924400, 0x974100, 0x9b3f00, 0x9f3c00, 0xa33a00, 0xa83700, 0xab3500, 0xaf3200, 0xb33000, 0xb72e00, 0xbb2b00, 0xbe2900, 0xc12700, 0xc52400, 0xc92200, 0xcc2000, 0xd01e00, 0xd31c00, 0xd71900, 0xda1700, 0xdc1500, 0xe01300, 0xe31100, 0xe60f00, 0xe90d00, 0xec0b00, 0xf00800, 0xf30600, 0xf60400, 0xf90200, 0xfc0000, 0xff0000
 }; 
 
-#define THRESHOLD 1
+#define THRESHOLD 0.01
 // The prescaler settings determine the frequency of audio sampling. We can sample higher
 // frequencies with a lower prescaler value, but it will also raise the lowest frequency that
 // we can sample. With this setup, I seem to be getting around 300Hz-9.6KHz response. There is
@@ -185,7 +182,7 @@ void r2g_spectrum(int test){
   int strip_len = 300;
   int sound_bins = 27;
   int bin;
-  int base_line = 100;
+  int base_line = 500;
   float i = 50;
   int divs = 17;
   float n;
@@ -238,7 +235,7 @@ void r2g_spectrum(int test){
     if(test == 0){
       led_nums = 0;
       if(bin > base_line){
-        led_nums = bin/20;
+        led_nums = bin/50;
       }
     }
     else{

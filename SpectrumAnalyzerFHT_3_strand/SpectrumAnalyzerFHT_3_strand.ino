@@ -135,18 +135,18 @@ void setup() {
   cli();         // disable interrupts when writing neopixels   
   mid_strip.show();
   sei();         // Enable interrupts
-  tre_strip.setBrightness(255);
-  tre_strip.begin(); // Initialize all pixels to 'off'
+  treb_strip.setBrightness(255);
+  treb_strip.begin(); // Initialize all pixels to 'off'
   cli();         // disable interrupts when writing neopixels   
-  tre_strip.show();
+  treb_strip.show();
   sei();         // Enable interrupts
-  Serial.begin(9600);  // set up Serial library at 9600 bps for debugging purposes
-
+//  Serial.begin(9600);  // set up Serial library at 9600 bps for debugging purposes
+  delay(3000);
 }
 
 
 void loop() {
-  Serial.println(ADC_CHANNEL);
+//  Serial.println(ADC_CHANNEL);
   uint16_t  x, L;
   while(ADCSRA & _BV(ADIE)); // Wait for audio sampling to finish
 
