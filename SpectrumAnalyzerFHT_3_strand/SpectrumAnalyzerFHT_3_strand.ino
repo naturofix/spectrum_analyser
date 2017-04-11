@@ -19,7 +19,7 @@
 #define base 5 // digital pin for programming neopixels
 #define mid 6 // digital pin for programming neopixels
 #define treb 7 // digital pin for programming neopixels
-#define NUM_LEDS 100// this is the size of my neopixel strip           
+#define NUM_LEDS 120// this is the size of my neopixel strip           
 
 Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_LEDS, base, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(NUM_LEDS, mid, NEO_GRB + NEO_KHZ800);
