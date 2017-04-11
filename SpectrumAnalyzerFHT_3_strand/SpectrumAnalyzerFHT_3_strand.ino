@@ -148,18 +148,24 @@ Adafruit_NeoPixel * stripArray[3] = {&base_strip, &mid_strip, &treb_strip};
   
   delay(3000);
     for(i=0; i<NUM_LEDS; i++) {
-    base_strip.setPixelColor(i,0,255,0); 
-    mid_strip.setPixelColor(i,0,0,255);
-    treb_strip.setPixelColor(i,255,0,0);
+          for(int s=0;s <3;s++){
+      stripArray[s]->setPixelColor(i,0,255,0);
+    }
+//    base_strip.setPixelColor(i,0,255,0); 
+//    mid_strip.setPixelColor(i,0,0,255);
+//    treb_strip.setPixelColor(i,255,0,0);
   }
   base_strip.show();
   mid_strip.show();
   treb_strip.show();
   delay(3000);
       for(i=0; i<NUM_LEDS; i++) {
-    base_strip.setPixelColor(i,0,0,255); 
-    mid_strip.setPixelColor(i,255,0,0);
-    treb_strip.setPixelColor(i,0,255,0);
+            for(int s=0;s <3;s++){
+      stripArray[s]->setPixelColor(i,0,0,255);
+    }
+//    base_strip.setPixelColor(i,0,0,255); 
+//    mid_strip.setPixelColor(i,255,0,0);
+//    treb_strip.setPixelColor(i,0,255,0);
   }
   base_strip.show();
   mid_strip.show();
