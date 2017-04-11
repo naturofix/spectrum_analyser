@@ -4,18 +4,6 @@
 #include <FHT.h>
 #include <Adafruit_NeoPixel.h>
 
-//
-// Spectrum analyzer
-// Pete Reiter
-// Spectrum analyzer with a Adafruit neopixel strip as output. Unlike an ordinary 2-dimensional spectrum
-// analyzer that uses Y-axis is display intensity of each frequency band, this uses color and brightness of
-// the LEDs to indicate the intensity. This code was originally adapted from the PICCOLO tiny music visualizer
-// on the Adafruit web site.
-// 
-// Software requirements:
-// - FHT library for Arduino
-// - Adafruit Neopixel library.
-
 #define base 5 // digital pin for programming neopixels
 #define mid 6 // digital pin for programming neopixels
 #define treb 7 // digital pin for programming neopixels
@@ -24,23 +12,11 @@
 Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_LEDS, base, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(NUM_LEDS, mid, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(NUM_LEDS, treb, NEO_GRB + NEO_KHZ800);
-
-
-
-// Microphone connects to Analog Pin 0.  Corresponding ADC channel number
-// varies among boards...it's ADC0 on Uno and Mega, ADC7 on Leonardo.
-// Other boards may require different settings; refer to datasheet.
-//#ifdef __AVR_ATmega32U4__
-// #define ADC_CHANNEL 7
-//#else
-// #define ADC_CHANNEL 0
-//#endif
 #define ADC_CHANNEL 0
 volatile uint32_t samplePos = 0;     // Buffer position counter
 
 static const uint8_t PROGMEM
-  // This is low-level noise that's subtracted from each FHT output column
-  // This was experimentally determined in a quiet room.
+
   noise[128]={ 
     50, 12, 10, 8, 7, 6, 6, 5, // 0
     5, 5, 4, 4, 4, 4, 4, 4,    // 8
@@ -146,6 +122,10 @@ void setup() {
 }
 
 void loop(){
+
+Adafruit_NeoPixel * stripArray[3] = {&base_strip, &mid_strip, &treb_strip};
+
+
     uint8_t cd = 100;
   uint8_t turn_off = 0;
 //  Serial.begin(57600);
@@ -154,13 +134,18 @@ void loop(){
   uint8_t i;
 //  unit8_t i;
   for(i=0; i<NUM_LEDS; i++) {
-    base_strip.setPixelColor(i,255,0,0); 
-    mid_strip.setPixelColor(i,0,255,0);
-    treb_strip.setPixelColor(i,0,0,255);
+    for(int s=0;s <3;s++){
+      stripArray[s]->setPixelColor(i,255,0,0);
+    }
+//    base_strip.setPixelColor(i,255,0,0); 
+//    mid_strip.setPixelColor(i,0,255,0);
+//    treb_strip.setPixelColor(i,0,0,255);
   }
   base_strip.show();
   mid_strip.show();
   treb_strip.show();
+
+  
   delay(3000);
     for(i=0; i<NUM_LEDS; i++) {
     base_strip.setPixelColor(i,0,255,0); 
