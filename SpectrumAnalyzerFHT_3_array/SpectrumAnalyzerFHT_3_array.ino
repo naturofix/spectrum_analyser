@@ -10,9 +10,11 @@
 #define NUM_LEDS 300// this is the size of my neopixel strip           
 
 Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_LEDS, base, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(10, mid, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(10, treb, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel * stripArray[3] = {&base_strip, &mid_strip, &treb_strip};
+//Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(10, mid, NEO_GRB + NEO_KHZ800);
+//Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(10, treb, NEO_GRB + NEO_KHZ800);
+//Adafruit_NeoPixel * stripArray[3] = {&base_strip, &mid_strip, &treb_strip};
+
+Adafruit_NeoPixel * stripArray[3] = {&base_strip};
 
 #define ADC_CHANNEL 0
 volatile uint32_t samplePos = 0;     // Buffer position counter
@@ -104,22 +106,15 @@ void setup() {
   // Neopixels setup
   // Initialize all pixels to 'off'
   int brightness = 255;
-  base_strip.setBrightness(brightness);
-  base_strip.begin(); // Initialize all pixels to 'off'
-  cli();         // disable interrupts when writing neopixels   
-  base_strip.show();
-  sei();         // Enable interrupts
-  mid_strip.setBrightness(brightness);
-  mid_strip.begin(); // Initialize all pixels to 'off'
-  cli();         // disable interrupts when writing neopixels   
-  mid_strip.show();
-  sei();         // Enable interrupts
-  treb_strip.setBrightness(brightness);
-  treb_strip.begin(); // Initialize all pixels to 'off'
-  cli();         // disable interrupts when writing neopixels   
-  treb_strip.show();
-  sei();         // Enable interrupts
-//  Serial.begin(9600);  // set up Serial library at 9600 bps for debugging purposes
+
+  for(int s=0;s <sizeof(stripArray);s++){
+    stripArray[s]->begin();
+    stripArray[s]->setBrightness(brightness);
+    cli();
+    stripArray[s]->show();
+    sei(); 
+  }
+
 
 }
 
