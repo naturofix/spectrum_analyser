@@ -16,10 +16,16 @@
 // - FHT library for Arduino
 // - Adafruit Neopixel library.
 
-#define PIN 5 // digital pin for programming neopixels
+#define base 5 // digital pin for programming neopixels
+#define mid 6 // digital pin for programming neopixels
+#define treb 7 // digital pin for programming neopixels
 #define NUM_PIXELS 300// this is the size of my neopixel strip           
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_PIXELS, base, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(NUM_PIXELS, mid, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(NUM_PIXELS, treb, NEO_GRB + NEO_KHZ800);
+
+
 
 // Microphone connects to Analog Pin 0.  Corresponding ADC channel number
 // varies among boards...it's ADC0 on Uno and Mega, ADC7 on Leonardo.
@@ -93,7 +99,7 @@ static const uint32_t PROGMEM colors[NUM_COLORS] = {
 0x42, 0x1c37, 0x332e, 0x4823, 0x5b1a, 0x6c11, 0x7c08, 0x8c00, 0x88900, 0x108600, 0x178300, 0x1e8100, 0x267e00, 0x2d7b00, 0x347700, 0x3a7400, 0x407100, 0x466e00, 0x4d6b00, 0x526800, 0x586500, 0x5e6200, 0x636000, 0x685d00, 0x6d5a00, 0x725700, 0x775400, 0x7c5100, 0x804f00, 0x864c00, 0x8a4900, 0x8f4600, 0x924400, 0x974100, 0x9b3f00, 0x9f3c00, 0xa33a00, 0xa83700, 0xab3500, 0xaf3200, 0xb33000, 0xb72e00, 0xbb2b00, 0xbe2900, 0xc12700, 0xc52400, 0xc92200, 0xcc2000, 0xd01e00, 0xd31c00, 0xd71900, 0xda1700, 0xdc1500, 0xe01300, 0xe31100, 0xe60f00, 0xe90d00, 0xec0b00, 0xf00800, 0xf30600, 0xf60400, 0xf90200, 0xfc0000, 0xff0000
 }; 
 
-#define THRESHOLD 0.0001
+#define THRESHOLD 1
 // The prescaler settings determine the frequency of audio sampling. We can sample higher
 // frequencies with a lower prescaler value, but it will also raise the lowest frequency that
 // we can sample. With this setup, I seem to be getting around 300Hz-9.6KHz response. There is
@@ -119,10 +125,10 @@ void setup() {
 
   // Neopixels setup
   // Initialize all pixels to 'off'
-  strip.setBrightness(25);
-  strip.begin(); // Initialize all pixels to 'off'
+  base_strip.setBrightness(255);
+  base_strip.begin(); // Initialize all pixels to 'off'
   cli();         // disable interrupts when writing neopixels   
-  strip.show();
+  base_strip.show();
   sei();         // Enable interrupts
   Serial.begin(9600);  // set up Serial library at 9600 bps for debugging purposes
 
@@ -148,18 +154,146 @@ void loop() {
   }
   
   
-  for (int t = 0; t < 128; t++) {
-    Serial.print(fht_lin_out[t]);
-    Serial.print(", ");
-  }
-  Serial.println();
+//  for (int t = 0; t < 128; t++) {
+//    Serial.print(fht_lin_out[t]);
+//    Serial.print(", ");
+//  }
+//  Serial.println();
   fht_lin_out[1] = (fht_lin_out[1] <= 500) ? 0 : (fht_lin_out[1] - 400);
+//  first_try();
+//  second_try();
+  r2g_spectrum(0);
+  base_strip.show();
+//  delayMicroseconds(10000);
+  //delay(100);
+  turn_off();
+      
+  //}
+  
+        // restore interrupts
+}
+
+void turn_off(){
+    for(int i=0; i<300; i++) {
+        base_strip.setPixelColor(i,0,0,0);
+      }
+     base_strip.show();
+}
+
+
+void r2g_spectrum(int test){
+  int strip_len = 300;
+  int sound_bins = 27;
+  int bin;
+  int base_line = 100;
+  float i = 50;
+  int divs = 17;
+  float n;
+   n = strip_len/divs;
+  int f = 1;
+  float r = 200;
+  float g = 0;
+  float b = 5;
+  float led_nums;
+  led_nums = 5;
+  
+  while(b > 0){
+    r = r + (n*1/3);
+    if(r > 255){
+      r = 255;
+    }
+    b = b - (n*1/3);
+    if(b < 0){
+       b = 0;
+     }
+    int j = i;
+    for(i;i<j+led_nums; i++){
+        base_strip.setPixelColor(i,r,g,b);
+      }
+     f += 1 ;
+  }
+  r = 255;
+  b = 0;
+  g = 0;
+  i = i+1;
+  while(r > 0){
+    if(r > 250){
+      r = r - n;
+    }
+    if(g > 127 && r >=0){
+      r = r - n;
+      g = g + n/2;
+      if(g > 255){
+          g = 255;
+      }
+      if(r < 0){
+          r = 0;
+      }
+    }
+    if(g <= 127){
+      g = g + n/2;
+    }
+    f += 1;
+    bin = fht_lin_out[f];
+    if(test == 0){
+      led_nums = 0;
+      if(bin > base_line){
+        led_nums = bin/20;
+      }
+    }
+    else{
+      print_rgb(r,g,b);
+    }
+    int j = i;
+    for(i;i<j+led_nums; i++){
+        base_strip.setPixelColor(i,r,g,b);
+      }
+  }
+}
+
+
+void print_rgb(int r,int g,int b){
+  Serial.print(r);
+  Serial.print(", ");
+  Serial.print(g);
+  Serial.print(", ");
+  Serial.println(b);
+}
+
+void second_try(){
+  
+  int sound_bins = 27;
+  int bin;
+  int base_line = 50;
+  float led_nums;
+  float i = 0;
+  int divs = 27;
+  for(int f = 0; f < divs; f++){
+    led_nums = 0;
+    bin = fht_lin_out[f];
+    if(bin > base_line){
+      led_nums = bin/20;
+    }
+    int j = i;
+    for(i;i<j+led_nums; i++){
+        base_strip.setPixelColor(i,255-((255/divs)*f),255/divs*f,0);
+      }
+  }
+      for(i; i<300; i++) {
+        base_strip.setPixelColor(i,0,0,0);
+      }
+}
+      
+    
+
+void first_try(){
   int base_line = 150;
   int base_led = 60;
   for(int f = 0; f < 16; f++){
+    float led_nums = 0;
     int bin = fht_lin_out[f];
     if(bin>base_line-(f+2)){
-      float led_nums = bin/50;
+      led_nums = bin/50;
       if(led_nums > 30){
         led_nums = 30;
       }
@@ -167,20 +301,10 @@ void loop() {
         led_nums = 0;
       }
       for(int i=0+(18*f); i<led_nums+(18*f); i++) {
-        strip.setPixelColor(i,255-(16*f),16*f,0);
+        base_strip.setPixelColor(i,255-(16*f),16*f,0);
       }
     }
   }
-  
-  strip.show();
-  delayMicroseconds(10);
-  for(int i=0; i<300; i++) {
-        strip.setPixelColor(i,0,0,0);
-      }
-      
-  //}
-  
-        // restore interrupts
 }
 
 // interrupt service routine. This gets called each time the ADC finishes 1 sample.
