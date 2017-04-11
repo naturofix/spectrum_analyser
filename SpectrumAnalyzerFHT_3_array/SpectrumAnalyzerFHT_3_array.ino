@@ -10,8 +10,8 @@
 #define NUM_LEDS 300// this is the size of my neopixel strip           
 
 Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_LEDS, base, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(1, mid, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(1, treb, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(10, mid, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(10, treb, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel * stripArray[3] = {&base_strip, &mid_strip, &treb_strip};
 
 #define ADC_CHANNEL 0
@@ -201,10 +201,10 @@ void turn_off(){
 void three_strand(int test){
   int strip_len = NUM_LEDS;
   int sound_bins = 27;
-  int strips = 3;
+  int strips = 1;
   int strip;
   int l;
-  int base_line = 150;
+  int base_line = 50;
   float r ;
   float g;
   float b;

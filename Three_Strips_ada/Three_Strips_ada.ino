@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 
 
-#define NUM_LEDS 250
+#define NUM_LEDS 200
 
 
 Adafruit_NeoPixel strip_a = Adafruit_NeoPixel(NUM_LEDS, 5);
