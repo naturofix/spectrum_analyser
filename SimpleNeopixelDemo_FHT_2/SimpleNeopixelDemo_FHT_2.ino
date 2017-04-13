@@ -3,7 +3,7 @@
 
 #include <FHT.h> // include the library
 
-#define PIXELS 600  // Number of pixels in the string
+#define PIXELS 60  // Number of pixels in the string
 // These values depend on which pin your string is connected to and what board you are using 
 // More info on how to find these at http://www.arduino.cc/en/Reference/PortManipulation
 
@@ -346,9 +346,7 @@ void setup() {
 
 
 void loop() {
-  byte test = 1;
-  if(test == 1){
-    while(1) { // reduces jitter
+  while(1) { // reduces jitter
     cli();  // UDRE interrupt slows this way down on arduino1.0
     for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
       while(!(ADCSRA & 0x10)); // wait for adc to be ready
@@ -365,46 +363,42 @@ void loop() {
     fht_run(); // process the data in the fht
     fht_mag_log(); // take the output of the fht
     sei();
-    Serial.write(255); // send a start byte
-    Serial.write(fht_log_out, FHT_N/2); // send out the data
+    Serial.println("start");
+    for (byte i = 0 ; i < FHT_N/2 ; i++) {
+      Serial.println(fht_log_out[i]); // send out the data
+    }
+  }
+//  for(int f = 4; f < 16; f++){
     
+    first_try();
+//  }
   
-
-  showColor(0, 0, 0);
-  delay(1);
-//  for(int i=0;i<1;i++){ 
-  showColor(25,0,0);
-//  delay(10000);
-  showColor(0,25,0);
-//  delay(10000);
-  showColor(0,0,25);
-  delay(1);  
-//  }
- }
-}
-
-// 
-//  for(int i = 0;i < 1000;i++){
-//    
-//    
-//  colorWipe(25, 0, 0, i); // Red
-////  delay(3000);
-//  colorWipe(0, 25, 0, i); // Green
-////  delay(3000);
-//  colorWipe(0, 0, 25, i); // Blue
-////  delay(3000);
-//  }
-//  
-//  // Send a theater pixel chase in...
-//  theaterChase(127, 127, 127, 0); // White
-//  theaterChase(127,   0,   0, 0); // Red
-//  theaterChase(  0,   0, 127, 0); // Blue
-//  
-//  rainbowCycle(1000 , 20 , 5 );
-//  detonate( 255 , 255 , 255 , 1000);
-//  
   return;
   
+}
+
+void first_try(){
+  int base_line = 200;
+  int base_led = 60;
+    float led_nums = 0;
+    for(int f = 4; f < 16; f++){
+    int bin = fht_log_out[f];
+    if(bin>base_line-(f+2)){
+      led_nums = bin/50;
+      if(led_nums > 10){
+        led_nums = 10;
+      }
+      if(led_nums < 2){
+        led_nums = 0;
+      }
+      for(int i=0+(18*f); i<led_nums+(18*f); i++) {
+//        base_strip.setPixelColor(i,255-(16*f),16*f,0);
+        sendPixel(255-(16*f),16*f,0);
+
+//        sendPixel(r,g,b)
+      }
+    }
+  }
 }
 
 
