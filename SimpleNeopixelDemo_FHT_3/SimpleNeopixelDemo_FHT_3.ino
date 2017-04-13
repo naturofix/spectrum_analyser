@@ -377,7 +377,7 @@ void loop() {
 //    }
 //  }
 
-    first_try();
+    long_sa();
     show();
     delay(1);
     showColor(0, 0, 0);
@@ -412,6 +412,37 @@ void first_try(){
   }
 }
 
+
+void long_sa(){
+  int brightness = 0.1; // 0 to 1
+  int base_line = 120;
+  int base_reduce = 5;
+  int col_len = 30;
+  float led_nums = 0;
+  byte divisions = 16;
+  float r = 255;
+  float g = 0;
+  float b = 0;
+  byte start = 0;
+  int cbin = 0;
+  for(byte f = start; f < start+divisions;f++){
+    int bin = fht_log_out[f];
+    int i = 0;
+    r = r-(255/divisions)*cbin;
+    if(r < 0){r = 0;}
+    g = g + (255/divisions)*cbin;
+    if(g > 255){g = 255;}
+    if( bin > base_line){
+      led_nums = bin/base_reduce;
+      for(i; i < led_nums || i < col_len;i++){
+        sendPixel(r*brightness,g*brightness,b*brightness);
+      }
+      for(i;i < col_len;i++){
+        sendPixel(0,0,0);
+      }
+    }
+  }
+}
 
 
 
