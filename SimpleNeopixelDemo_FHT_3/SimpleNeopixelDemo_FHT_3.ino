@@ -389,15 +389,15 @@ void loop() {
 }
 
 void first_try(){
-  int base_line = 50;
+  int base_line = 120;
   int base_led = 60;
     float led_nums = 0;
-    for(int f = 4; f < 16; f++){
+    for(int f = 2; f < 16; f++){
     int bin = fht_log_out[f];
     if(bin>base_line-(f+2)){
-      led_nums = bin/50;
-      if(led_nums > 10){
-        led_nums = 10;
+      led_nums = bin/5;
+      if(led_nums > 30){
+        led_nums = 30;
       }
       if(led_nums < 2){
         led_nums = 0;
