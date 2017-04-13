@@ -157,9 +157,9 @@ void loop() {
 //  }
 //  Serial.println();
   fht_lin_out[1] = (fht_lin_out[1] <= 500) ? 0 : (fht_lin_out[1] - 400);
-//  first_try();
+  first_try();
 //  second_try();
-  r2g_spectrum(0);
+//  r2g_spectrum(1);
   base_strip.show();
 //  delayMicroseconds(10000);
   //delay(100);
@@ -284,15 +284,15 @@ void second_try(){
     
 
 void first_try(){
-  int base_line = 150;
+  int base_line = 200;
   int base_led = 60;
-  for(int f = 0; f < 16; f++){
+  for(int f = 4; f < 16; f++){
     float led_nums = 0;
     int bin = fht_lin_out[f];
     if(bin>base_line-(f+2)){
       led_nums = bin/50;
-      if(led_nums > 30){
-        led_nums = 30;
+      if(led_nums > 10){
+        led_nums = 10;
       }
       if(led_nums < 2){
         led_nums = 0;

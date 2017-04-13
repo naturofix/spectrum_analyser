@@ -7,11 +7,13 @@
 #define base 5 // digital pin for programming neopixels
 #define mid 6 // digital pin for programming neopixels
 #define treb 7 // digital pin for programming neopixels
-#define NUM_LEDS 300// this is the size of my neopixel strip           
+#define NUM_PIXELS 200// this is the size of my neopixel strip           
 
-Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_LEDS, base, NEO_GRB + NEO_KHZ800);
-//Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(10, mid, NEO_GRB + NEO_KHZ800);
-//Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(10, treb, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel base_strip = Adafruit_NeoPixel(NUM_PIXELS, base, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel mid_strip = Adafruit_NeoPixel(NUM_PIXELS, mid, NEO_GRB + NEO_KHZ800);
+//Adafruit_NeoPixel treb_strip = Adafruit_NeoPixel(NUM_PIXELS, treb, NEO_GRB + NEO_KHZ800);
+
+
 //Adafruit_NeoPixel * stripArray[3] = {&base_strip, &mid_strip, &treb_strip};
 
 Adafruit_NeoPixel * stripArray[3] = {&base_strip};
@@ -79,7 +81,7 @@ static const uint32_t PROGMEM colors[NUM_COLORS] = {
 0x42, 0x1c37, 0x332e, 0x4823, 0x5b1a, 0x6c11, 0x7c08, 0x8c00, 0x88900, 0x108600, 0x178300, 0x1e8100, 0x267e00, 0x2d7b00, 0x347700, 0x3a7400, 0x407100, 0x466e00, 0x4d6b00, 0x526800, 0x586500, 0x5e6200, 0x636000, 0x685d00, 0x6d5a00, 0x725700, 0x775400, 0x7c5100, 0x804f00, 0x864c00, 0x8a4900, 0x8f4600, 0x924400, 0x974100, 0x9b3f00, 0x9f3c00, 0xa33a00, 0xa83700, 0xab3500, 0xaf3200, 0xb33000, 0xb72e00, 0xbb2b00, 0xbe2900, 0xc12700, 0xc52400, 0xc92200, 0xcc2000, 0xd01e00, 0xd31c00, 0xd71900, 0xda1700, 0xdc1500, 0xe01300, 0xe31100, 0xe60f00, 0xe90d00, 0xec0b00, 0xf00800, 0xf30600, 0xf60400, 0xf90200, 0xfc0000, 0xff0000
 }; 
 
-#define THRESHOLD 0.01
+#define THRESHOLD 1
 // The prescaler settings determine the frequency of audio sampling. We can sample higher
 // frequencies with a lower prescaler value, but it will also raise the lowest frequency that
 // we can sample. With this setup, I seem to be getting around 300Hz-9.6KHz response. There is
@@ -106,14 +108,27 @@ void setup() {
   // Neopixels setup
   // Initialize all pixels to 'off'
   int brightness = 255;
+  base_strip.setBrightness(brightness);
+  base_strip.begin(); // Initialize all pixels to 'off'
+  cli();         // disable interrupts when writing neopixels   
+  base_strip.show();
+  sei();         // Enable interrupts
+  
+  mid_strip.setBrightness(brightness);
+  mid_strip.begin(); // Initialize all pixels to 'off'
+  cli();         // disable interrupts when writing neopixels   
+  mid_strip.show();
+  sei();         // Enable interrupts
+  Serial.begin(9600);
 
-  for(int s=0;s <sizeof(stripArray);s++){
-    stripArray[s]->begin();
-    stripArray[s]->setBrightness(brightness);
-    cli();
-    stripArray[s]->show();
-    sei(); 
-  }
+//  for(int s=0;s <sizeof(stripArray);s++){
+//    stripArray[s]->begin();
+////    stripArray[s]->setBrightness(brightness);
+////    cli();
+//    stripArray[s]->show();
+////    sei(); 
+//  }
+//  Serial.begin(9600);
 
 
 }
@@ -126,11 +141,11 @@ void setup() {
 //    uint8_t cd = 100;
 //  uint8_t turn_off = 0;
 ////  Serial.begin(57600);
-////  uint8_t led_nums = NUM_LEDS;
+////  uint8_t led_nums = NUM_PIXELS;
 //  uint8_t delay_num = 5;
 //  uint8_t i;
 ////  unit8_t i;
-//  for(i=0; i<NUM_LEDS; i++) {
+//  for(i=0; i<NUM_PIXELS; i++) {
 //    for(int s=0;s <3;s++){
 //      stripArray[s]->setPixelColor(i,255,0,0);
 //    }
@@ -144,7 +159,7 @@ void setup() {
 //
 //  
 //  delay(3000);
-//    for(i=0; i<NUM_LEDS; i++) {
+//    for(i=0; i<NUM_PIXELS; i++) {
 //    base_strip.setPixelColor(i,0,255,0); 
 //    mid_strip.setPixelColor(i,0,0,255);
 //    treb_strip.setPixelColor(i,255,0,0);
@@ -153,7 +168,7 @@ void setup() {
 //  mid_strip.show();
 //  treb_strip.show();
 //  delay(3000);
-//      for(i=0; i<NUM_LEDS; i++) {
+//      for(i=0; i<NUM_PIXELS; i++) {
 //    base_strip.setPixelColor(i,0,0,255); 
 //    mid_strip.setPixelColor(i,255,0,0);
 //    treb_strip.setPixelColor(i,0,255,0);
@@ -176,41 +191,64 @@ void loop() {
   fht_mag_lin();
   samplePos = 0;                   // Reset sample counter
   ADCSRA |= _BV(ADIE);             // Resume sampling interrupt
+    // Remove noise
+  for(x=0; x<FHT_N/2; x++) {
+//    L = (pgm_read_byte(&noise[x]) << 6);
+//    fht_lin_out[x] = (fht_lin_out[x] <= L) ? 0 : (fht_lin_out[x] - L);
+  }
+  
   
   fht_lin_out[1] = (fht_lin_out[1] <= 500) ? 0 : (fht_lin_out[1] - 400);
-
-//  r2g_spectrum(0);
+  first_try();
+  //r2g_spectrum(1);
+//  base_strip.show();
   three_strand(0);
+  base_strip.show();
+//  array_show();
+  turn_off();
+  //array_show();
+  
   //base_strip.show();
 
 }
+void array_show(){
+    for(int s=0 ;s < sizeof(stripArray);s++){
+    stripArray[s]->show();
+  }
+}
 
+void turn_off_array(){
+    for(int s=0 ;s < sizeof(stripArray);s++){
+      for(int i=0; i<NUM_PIXELS; i++) {
+          stripArray[s]->setPixelColor(i,0,0,0);
+        }
+    }
+}
 void turn_off(){
-    for(int i=0; i<300; i++) {
+    for(int i=0; i<NUM_PIXELS; i++) {
         base_strip.setPixelColor(i,0,0,0);
       }
      base_strip.show();
 }
 
-
 void three_strand(int test){
-  int strip_len = NUM_LEDS;
+  int strip_len = NUM_PIXELS;
   int sound_bins = 27;
   int strips = 1;
   int strip;
-  int l;
-  int base_line = 50;
+  int led;
+  int base_line = 150;
   float r ;
   float g;
   float b;
   float n = 255/sound_bins/strips;
-  for(int bin = 0; bin < sound_bins; bin++){
+  for(int bin = 1; bin < sound_bins; bin++){
     int h = fht_lin_out[bin];
     if(bin < sound_bins/strips){
       if(h < base_line){
         strip = 0;
         b = 0;
-        l = (strip_len/(sound_bins/strips))*bin;
+        led = (strip_len/(sound_bins/strips))*bin;
         if(r > 0){
           r = r-n*bin;
           if(r < 0){
@@ -223,15 +261,12 @@ void three_strand(int test){
             g = 255;
           }
         }
-        for(l;l < l+h;l++){
-          stripArray[strip]->setPixelColor(l,r,g,b);
+        for(led;led < led+(h/50);led++){
+          stripArray[strip]->setPixelColor(led,r,g,b);
         }
       }
     }
-  }
-  for(int s=0;s <3;s++){
-    stripArray[s]->show();
-  }
+  }  
 }
 
 void r2g_spectrum(int test){
@@ -340,7 +375,7 @@ void second_try(){
     
 
 void first_try(){
-  int base_line = 150;
+  int base_line = 500;
   int base_led = 60;
   for(int f = 0; f < 16; f++){
     float led_nums = 0;

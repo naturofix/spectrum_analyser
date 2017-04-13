@@ -31,7 +31,7 @@ void setup() {
 
 void loop() {
   uint8_t cd = 100;
-  uint8_t turn_off = 0;
+  uint8_t turn_off = 1;
 //  Serial.begin(57600);
 //  uint8_t led_nums = NUM_LEDS;
   uint8_t delay_num = 5;
