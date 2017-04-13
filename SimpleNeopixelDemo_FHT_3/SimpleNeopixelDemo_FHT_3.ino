@@ -3,7 +3,7 @@
 
 #include <FHT.h> // include the library
 
-#define PIXELS 60  // Number of pixels in the string
+#define PIXELS 300  // Number of pixels in the string
 // These values depend on which pin your string is connected to and what board you are using 
 // More info on how to find these at http://www.arduino.cc/en/Reference/PortManipulation
 
@@ -341,19 +341,19 @@ void setup() {
   ADCSRA = 0xe5; // set the adc to free running mode
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
-  
+  showColor(0, 0, 0);
 }
 
 
 void loop() {
-    for(int f = 4; f < 16; f++){
-    showColor(25, 0, 0, 0); // Red
-    delay(100)
-    showColor(0, 25, 0, 0); // Green
-    delay(100);
-    showColor(0, 0, 25, 0); // Blue
-    delay(100);
-  }
+//    for(int f = 4; f < 16; f++){
+//    showColor(25, 0, 0); // Red
+//    delay(100);
+//    showColor(0, 25, 0); // Green
+//    delay(100);
+//    showColor(0, 0, 25); // Blue
+//    delay(100);
+//  }
   while(1) { // reduces jitter
     cli();  // UDRE interrupt slows this way down on arduino1.0
     for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
@@ -371,13 +371,17 @@ void loop() {
     fht_run(); // process the data in the fht
     fht_mag_log(); // take the output of the fht
     sei();
-    Serial.println("start");
-    for (byte i = 0 ; i < FHT_N/2 ; i++) {
-      Serial.println(fht_log_out[i]); // send out the data
-    }
-  }
+//    Serial.println("start");
+//    for (byte i = 0 ; i < FHT_N/2 ; i++) {
+//      Serial.println(fht_log_out[i]); // send out the data
+//    }
+//  }
 
     first_try();
+    show();
+    delay(1);
+    showColor(0, 0, 0);
+}
 //  }
   
   return;
@@ -385,7 +389,7 @@ void loop() {
 }
 
 void first_try(){
-  int base_line = 200;
+  int base_line = 50;
   int base_led = 60;
     float led_nums = 0;
     for(int f = 4; f < 16; f++){
