@@ -439,12 +439,14 @@ void long_sa(byte print_test, byte test, byte dim,byte base_line){
   float r = 255;
   float g = 0;
   float b = 0;
-  byte start = 0;
+  byte start = 1;
   int cbin = 0;
   int x = 0; //total number of leds
   int rb;
   int gb;
   int bb;
+
+  
   for(byte f = start; f < start+divisions;f++){
     int bin = fht_log_out[f]; //intensity of frequency
     int i = 0; 
@@ -452,6 +454,93 @@ void long_sa(byte print_test, byte test, byte dim,byte base_line){
     r = r - 255/divisions;
     if(r < 0){r = 0;}
     g = g + 255/divisions;
+    if(g > 255){g = 255;}
+    if(dim == 1){
+      rb = r*brightness;
+      gb = g*brightness;
+      bb = b*brightness;
+    }
+    else{
+      rb = r;
+      gb = g;
+      bb = b;
+    }
+
+    if( bin > base_line || test == 1){
+      led_nums = bin/base_reduce;
+      if(led_nums > col_len || test == 1){
+        led_nums = col_len;
+      }
+      for(i; i < led_nums; i++){
+        sendPixel(rb,gb,bb);
+        x += 1;
+        if(print_test == 1){
+          Serial.print("x : ");
+          Serial.print(x);
+          Serial.print("    i : ");
+          Serial.print(i);
+          Serial.print("    rgb : ");
+          Serial.print(r);
+          Serial.print(", ");
+          Serial.print(g);
+          Serial.print(", ");
+          Serial.println(b);
+        }
+        
+      }
+    }
+    for(i;i < col_len;i++){
+      sendPixel(5,5,5);
+      x += 1;
+     if(print_test == 1){
+        Serial.print("x : ");
+        Serial.print(x);
+        Serial.print("    i : ");
+        Serial.print(i);
+        Serial.print("    rgb : ");
+        Serial.print(0);
+        Serial.print(", ");
+        Serial.print(0);
+        Serial.print(", ");
+        Serial.println(5);
+      }
+    }
+    
+  cbin += 1;
+  if(print_test == 1){
+      Serial.print("cbin : ");
+      Serial.println(cbin);
+      Serial.print("x : ");
+      Serial.print(x);
+      Serial.print("         i : ");
+      Serial.println(i);
+      Serial.print("LED NUM :");
+      Serial.println(led_nums);
+      Serial.print("Divisions : ");
+      Serial.println(divisions);
+      Serial.println((255/divisions)*cbin);
+      Serial.print(r);
+      Serial.print(", ");
+      Serial.print(g);
+      Serial.print(", ");
+      Serial.println(b);
+      Serial.println();
+    }
+  }
+
+
+
+  r = 0;
+  g = 255;
+  b = 0;
+  for(byte f = start+divisions; f < f + divisions;f++){
+    int bin = fht_log_out[f]; //intensity of frequency
+    int i = 0; 
+    led_nums = 0; //reset Led nums
+    
+    g = g - 255/divisions;
+    if(r < 0){r = 0;}
+    b = b + 255/divisions;
     if(g > 255){g = 255;}
     if(dim == 1){
       rb = r*brightness;
