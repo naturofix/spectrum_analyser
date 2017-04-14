@@ -384,7 +384,7 @@ void loop() {
 //      Serial.println(fht_log_out[i]); // send out the data
 //    }
 //  }
-    byte print_test = 1; //1 to print variables
+    byte print_test = 0; //1 to print variables
     if(print_test == 1){
       Serial.begin(9600);
     }
