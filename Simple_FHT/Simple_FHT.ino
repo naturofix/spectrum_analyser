@@ -449,9 +449,9 @@ void long_sa(byte print_test, byte test, byte dim,byte base_line){
     int bin = fht_log_out[f]; //intensity of frequency
     int i = 0; 
     led_nums = 0; //reset Led nums
-    r = r - (255/divisions)*cbin;
+    r = r - 255/divisions;
     if(r < 0){r = 0;}
-    g = g + (255/divisions)*cbin;
+    g = g + 255/divisions;
     if(g > 255){g = 255;}
     if(dim == 1){
       rb = r*brightness;
