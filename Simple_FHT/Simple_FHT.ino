@@ -388,7 +388,7 @@ void loop() {
     if(print_test == 1){
       Serial.begin(9600);
     }
-    byte colrange = 1;
+    byte colrange = 2;
     byte test = 0; //1 to turn all lights on, showing the rainbow disttribution
     byte dim = 1; // 1 to dim all light, by the percentage in brightness
     byte baseline = 120;// threshold for triggering lights
@@ -396,7 +396,7 @@ void loop() {
     show();
     delay(1);
     if(test != 1){
-      showColor(5, 5, 5);
+      base_color();
     }
 }
 //  }
@@ -405,6 +405,10 @@ void loop() {
   
 }
 
+
+void base_color(){
+  showColor(0, 0, 0);
+}
 void first_try(){
   int base_line = 120;
   int base_led = 60;
@@ -432,7 +436,7 @@ void first_try(){
 
 void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line){
 
-  float brightness = 0.1; // 0 to 1
+  float brightness = 0.5; // 0 to 1
   int base_reduce = 1; // divide internsity to trigger less lights
   int col_len = 900/(FHT_N/2); // number of lights per bin
   float led_nums = 0;
@@ -491,7 +495,7 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
         }
       }
       for(i;i < col_len;i++){
-        sendPixel(5,5,5);
+        base_color();
         x += 1;
        if(print_test == 1){
           Serial.print("x : ");
@@ -579,7 +583,7 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
         }
       }
       for(i;i < col_len;i++){
-        sendPixel(5,5,5);
+        base_color();
         x += 1;
        if(print_test == 1){
           Serial.print("x : ");
