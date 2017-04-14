@@ -389,13 +389,13 @@ void loop() {
       Serial.begin(9600);
     }
     byte test = 0; //1 to turn all lights on, showing the rainbow disttribution
-    byte dim = 0; // 1 to dim all light, by the percentage in brightness
-    byte baseline = 90;// threshold for triggering lights
+    byte dim = 1; // 1 to dim all light, by the percentage in brightness
+    byte baseline = 120;// threshold for triggering lights
     long_sa(print_test,test,dim,baseline);
     show();
     delay(1);
     if(test != 1){
-      showColor(0, 0, 5);
+      showColor(5, 5, 5);
     }
 }
 //  }
@@ -488,7 +488,7 @@ void long_sa(byte print_test, byte test, byte dim,byte base_line){
       }
     }
     for(i;i < col_len;i++){
-      sendPixel(0,0,5);
+      sendPixel(5,5,5);
       x += 1;
      if(print_test == 1){
         Serial.print("x : ");
