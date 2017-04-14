@@ -391,6 +391,8 @@ void loop() {
     byte colrange = 2; 
     // 1 red to green
     // 2 green to blue
+    // 3 red to green to blue
+    
     byte test = 1; //1 to turn all lights on, showing the rainbow disttribution
     byte dim = 1; // 1 to dim all light, by the percentage in brightness
     byte baseline = 120;// threshold for triggering lights
@@ -453,7 +455,7 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
   int gb;
   int bb;
 
-  if(colrange == 1){
+  if(colrange == 1 || colrange ==3){
     for(byte f = start; f < start+divisions;f++){
       int bin = fht_log_out[f]; //intensity of frequency
       int i = 0; 
@@ -536,7 +538,7 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
     }
   }
 
-  if(colrange == 2){
+  if(colrange == 2 || colrange == 3){
   
     r = 0;
     g = 255;
