@@ -384,10 +384,14 @@ void loop() {
 //      Serial.println(fht_log_out[i]); // send out the data
 //    }
 //  }
+    byte print_test = 1; //1 to print variables
+    if(print_test == 1){
+      Serial.begin(9600);
+    }
     byte test = 1; //1 to turn all lights on, showing the rainbow disttribution
     byte dim = 0; // 1 to dim all light, but the percentage in brightness
     byte baseline = 90;// threshold for triggering lights
-    long_sa(test,dim,baseline);
+    long_sa(print_test,test,dim,baseline);
     show();
     delay(1);
     if(test != 1){
@@ -425,7 +429,7 @@ void first_try(){
 }
 
 
-void long_sa(byte test, byte dim,byte base_line){
+void long_sa(byte print_test, byte test, byte dim,byte base_line){
 
   float brightness = 0.1; // 0 to 1
   int base_reduce = 1; // divide internsity to trigger less lights
@@ -458,6 +462,17 @@ void long_sa(byte test, byte dim,byte base_line){
       rb = r;
       gb = g;
       bb = b;
+    }
+    if(print_test == 1){
+      Serial.print("Divisions : ");
+      Serial.println(divisions);
+      Serial.println((255/divisions)*cbin);
+      Serial.print(r);
+      Serial.print(", ");
+      Serial.print(g);
+      Serial.print(", ");
+      Serial.println(b);
+      Serial.println();
     }
     if( bin > base_line || test == 1){
       led_nums = bin/base_reduce;
