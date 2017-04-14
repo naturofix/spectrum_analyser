@@ -423,8 +423,8 @@ void first_try(){
 
 void long_sa(){
   float brightness = 0.1; // 0 to 1
-  int base_line = 120; // threshold for triggering lights
-  int base_reduce = 5; // divide internsity to trigger less lights
+  int base_line = 60; // threshold for triggering lights
+  int base_reduce = 1; // divide internsity to trigger less lights
   int col_len = 900/(FHT_N/2); // number of lights per bin
   float led_nums = 0;
   byte divisions = (FHT_N/2)/3;
@@ -437,6 +437,7 @@ void long_sa(){
   for(byte f = start; f < start+divisions;f++){
     int bin = fht_log_out[f]; //intensity of frequency
     int i = 0; 
+    led_nums = 0; //reset Led nums
     r = r-(255/divisions)*cbin;
     if(r < 0){r = 0;}
     g = g + (255/divisions)*cbin;
