@@ -472,21 +472,48 @@ void long_sa(byte print_test, byte test, byte dim,byte base_line){
       for(i; i < led_nums; i++){
         sendPixel(rb,gb,bb);
         x += 1;
+        if(print_test == 1){
+          Serial.print("x : ");
+          Serial.print(x);
+          Serial.print("    i : ");
+          Serial.print(i);
+          Serial.print("    rgb : ");
+          Serial.print(r);
+          Serial.print(", ");
+          Serial.print(g);
+          Serial.print(", ");
+          Serial.println(b);
+        }
+        
       }
     }
     for(i;i < col_len;i++){
       sendPixel(0,0,5);
       x += 1;
+     if(print_test == 1){
+        Serial.print("x : ");
+        Serial.print(x);
+        Serial.print("    i : ");
+        Serial.print(i);
+        Serial.print("    rgb : ");
+        Serial.print(0);
+        Serial.print(", ");
+        Serial.print(0);
+        Serial.print(", ");
+        Serial.println(5);
+      }
     }
     
   cbin += 1;
   if(print_test == 1){
       Serial.print("cbin : ");
       Serial.println(cbin);
-      Serial.println("x : ");
-      Serial.println(x);
+      Serial.print("x : ");
+      Serial.print(x);
+      Serial.print("         i : ");
+      Serial.println(i);
       Serial.print("LED NUM :");
-      Serial.print(led_nums);
+      Serial.println(led_nums);
       Serial.print("Divisions : ");
       Serial.println(divisions);
       Serial.println((255/divisions)*cbin);
