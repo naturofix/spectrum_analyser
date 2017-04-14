@@ -422,7 +422,7 @@ void first_try(){
 
 
 void long_sa(){
-  int brightness = 0.1; // 0 to 1
+  float brightness = 0.1; // 0 to 1
   int base_line = 120; // threshold for triggering lights
   int base_reduce = 5; // divide internsity to trigger less lights
   int col_len = 900/(FHT_N/2); // number of lights per bin
