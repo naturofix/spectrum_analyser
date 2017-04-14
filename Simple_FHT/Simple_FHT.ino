@@ -384,12 +384,14 @@ void loop() {
 //      Serial.println(fht_log_out[i]); // send out the data
 //    }
 //  }
-    byte print_test = 0; //1 to print variables
+    byte print_test = 1; //1 to print variables
     if(print_test == 1){
       Serial.begin(9600);
     }
-    byte colrange = 2;
-    byte test = 0; //1 to turn all lights on, showing the rainbow disttribution
+    byte colrange = 2; 
+    // 1 red to green
+    // 2 green to blue
+    byte test = 1; //1 to turn all lights on, showing the rainbow disttribution
     byte dim = 1; // 1 to dim all light, by the percentage in brightness
     byte baseline = 120;// threshold for triggering lights
     long_sa(colrange,print_test,test,dim,baseline);
