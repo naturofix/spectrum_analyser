@@ -346,7 +346,7 @@ void setup() {
   ADCSRA = 0xe5; // set the adc to free running mode
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
-  for(int i = 0,i < 10; i++){
+  for(int i = 0;i < 10; i++){
     showColor(0, 0, 0);
     delay(3000);
     showColor(25, 0, 0);
@@ -388,7 +388,7 @@ void loop() {
     long_sa();
     show();
     delay(1);
-    showColor(0, 0, 0);
+    showColor(0, 0, 5);
 }
 //  }
   
@@ -433,22 +433,29 @@ void long_sa(){
   float b = 0;
   byte start = 0;
   int cbin = 0;
+  int x = 0; //total number of leds
   for(byte f = start; f < start+divisions;f++){
-    int bin = fht_log_out[f];
-    int i = 0;
+    int bin = fht_log_out[f]; //intensity of frequency
+    int i = 0; 
     r = r-(255/divisions)*cbin;
     if(r < 0){r = 0;}
     g = g + (255/divisions)*cbin;
     if(g > 255){g = 255;}
     if( bin > base_line){
       led_nums = bin/base_reduce;
-      for(i; i < led_nums || i < col_len;i++){
-        sendPixel(r*brightness,g*brightness,b*brightness);
+      if(led_nums > col_len){
+        led_nums = col_len;
       }
-      for(i;i < col_len;i++){
-        sendPixel(0,0,0);
+      for(i; i < led_nums; i++){
+        sendPixel(r*brightness,g*brightness,b*brightness);
+        x += 1;
       }
     }
+    for(i;i < col_len;i++){
+      sendPixel(0,0,5);
+      x += 1;
+    }
+  cbin += 1;
   }
 }
 
