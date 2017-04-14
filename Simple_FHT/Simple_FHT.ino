@@ -463,17 +463,7 @@ void long_sa(byte print_test, byte test, byte dim,byte base_line){
       gb = g;
       bb = b;
     }
-    if(print_test == 1){
-      Serial.print("Divisions : ");
-      Serial.println(divisions);
-      Serial.println((255/divisions)*cbin);
-      Serial.print(r);
-      Serial.print(", ");
-      Serial.print(g);
-      Serial.print(", ");
-      Serial.println(b);
-      Serial.println();
-    }
+
     if( bin > base_line || test == 1){
       led_nums = bin/base_reduce;
       if(led_nums > col_len || test == 1){
@@ -488,7 +478,25 @@ void long_sa(byte print_test, byte test, byte dim,byte base_line){
       sendPixel(0,0,5);
       x += 1;
     }
+    
   cbin += 1;
+  if(print_test == 1){
+      Serial.print("cbin : ");
+      Serial.println(cbin);
+      Serial.println("x : ");
+      Serial.println(x);
+      Serial.print("LED NUM :");
+      Serial.print(led_nums);
+      Serial.print("Divisions : ");
+      Serial.println(divisions);
+      Serial.println((255/divisions)*cbin);
+      Serial.print(r);
+      Serial.print(", ");
+      Serial.print(g);
+      Serial.print(", ");
+      Serial.println(b);
+      Serial.println();
+    }
   }
 }
 
