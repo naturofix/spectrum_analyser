@@ -388,10 +388,11 @@ void loop() {
     if(print_test == 1){
       Serial.begin(9600);
     }
+    byte colrange = 1;
     byte test = 0; //1 to turn all lights on, showing the rainbow disttribution
     byte dim = 1; // 1 to dim all light, by the percentage in brightness
     byte baseline = 120;// threshold for triggering lights
-    long_sa(print_test,test,dim,baseline);
+    long_sa(colrange,print_test,test,dim,baseline);
     show();
     delay(1);
     if(test != 1){
@@ -429,7 +430,7 @@ void first_try(){
 }
 
 
-void long_sa(byte print_test, byte test, byte dim,byte base_line){
+void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line){
 
   float brightness = 0.1; // 0 to 1
   int base_reduce = 1; // divide internsity to trigger less lights
@@ -446,172 +447,174 @@ void long_sa(byte print_test, byte test, byte dim,byte base_line){
   int gb;
   int bb;
 
-  
-  for(byte f = start; f < start+divisions;f++){
-    int bin = fht_log_out[f]; //intensity of frequency
-    int i = 0; 
-    led_nums = 0; //reset Led nums
-    r = r - 255/divisions;
-    if(r < 0){r = 0;}
-    g = g + 255/divisions;
-    if(g > 255){g = 255;}
-    if(dim == 1){
-      rb = r*brightness;
-      gb = g*brightness;
-      bb = b*brightness;
-    }
-    else{
-      rb = r;
-      gb = g;
-      bb = b;
-    }
-
-    if( bin > base_line || test == 1){
-      led_nums = bin/base_reduce;
-      if(led_nums > col_len || test == 1){
-        led_nums = col_len;
+  if(colrange == 1){
+    for(byte f = start; f < start+divisions;f++){
+      int bin = fht_log_out[f]; //intensity of frequency
+      int i = 0; 
+      led_nums = 0; //reset Led nums
+      r = r - 255/divisions;
+      if(r < 0){r = 0;}
+      g = g + 255/divisions;
+      if(g > 255){g = 255;}
+      if(dim == 1){
+        rb = r*brightness;
+        gb = g*brightness;
+        bb = b*brightness;
       }
-      for(i; i < led_nums; i++){
-        sendPixel(rb,gb,bb);
+      else{
+        rb = r;
+        gb = g;
+        bb = b;
+      }
+  
+      if( bin > base_line || test == 1){
+        led_nums = bin/base_reduce;
+        if(led_nums > col_len || test == 1){
+          led_nums = col_len;
+        }
+        for(i; i < led_nums; i++){
+          sendPixel(rb,gb,bb);
+          x += 1;
+          if(print_test == 1){
+            Serial.print("x : ");
+            Serial.print(x);
+            Serial.print("    i : ");
+            Serial.print(i);
+            Serial.print("    rgb : ");
+            Serial.print(r);
+            Serial.print(", ");
+            Serial.print(g);
+            Serial.print(", ");
+            Serial.println(b);
+          }
+          
+        }
+      }
+      for(i;i < col_len;i++){
+        sendPixel(5,5,5);
         x += 1;
-        if(print_test == 1){
+       if(print_test == 1){
           Serial.print("x : ");
           Serial.print(x);
           Serial.print("    i : ");
           Serial.print(i);
           Serial.print("    rgb : ");
-          Serial.print(r);
+          Serial.print(0);
           Serial.print(", ");
-          Serial.print(g);
+          Serial.print(0);
           Serial.print(", ");
-          Serial.println(b);
+          Serial.println(5);
         }
-        
       }
-    }
-    for(i;i < col_len;i++){
-      sendPixel(5,5,5);
-      x += 1;
-     if(print_test == 1){
+      
+    cbin += 1;
+    if(print_test == 1){
+        Serial.print("cbin : ");
+        Serial.println(cbin);
         Serial.print("x : ");
         Serial.print(x);
-        Serial.print("    i : ");
-        Serial.print(i);
-        Serial.print("    rgb : ");
-        Serial.print(0);
+        Serial.print("         i : ");
+        Serial.println(i);
+        Serial.print("LED NUM :");
+        Serial.println(led_nums);
+        Serial.print("Divisions : ");
+        Serial.println(divisions);
+        Serial.println((255/divisions)*cbin);
+        Serial.print(r);
         Serial.print(", ");
-        Serial.print(0);
+        Serial.print(g);
         Serial.print(", ");
-        Serial.println(5);
+        Serial.println(b);
+        Serial.println();
       }
-    }
-    
-  cbin += 1;
-  if(print_test == 1){
-      Serial.print("cbin : ");
-      Serial.println(cbin);
-      Serial.print("x : ");
-      Serial.print(x);
-      Serial.print("         i : ");
-      Serial.println(i);
-      Serial.print("LED NUM :");
-      Serial.println(led_nums);
-      Serial.print("Divisions : ");
-      Serial.println(divisions);
-      Serial.println((255/divisions)*cbin);
-      Serial.print(r);
-      Serial.print(", ");
-      Serial.print(g);
-      Serial.print(", ");
-      Serial.println(b);
-      Serial.println();
     }
   }
 
-
-
-  r = 0;
-  g = 255;
-  b = 0;
-  for(byte f = start+divisions; f < f + divisions;f++){
-    int bin = fht_log_out[f]; //intensity of frequency
-    int i = 0; 
-    led_nums = 0; //reset Led nums
-    
-    g = g - 255/divisions;
-    if(r < 0){r = 0;}
-    b = b + 255/divisions;
-    if(g > 255){g = 255;}
-    if(dim == 1){
-      rb = r*brightness;
-      gb = g*brightness;
-      bb = b*brightness;
-    }
-    else{
-      rb = r;
-      gb = g;
-      bb = b;
-    }
-
-    if( bin > base_line || test == 1){
-      led_nums = bin/base_reduce;
-      if(led_nums > col_len || test == 1){
-        led_nums = col_len;
+  if(colrange == 2){
+  
+    r = 0;
+    g = 255;
+    b = 0;
+    for(byte f = start+divisions; f < f + divisions;f++){
+      int bin = fht_log_out[f]; //intensity of frequency
+      int i = 0; 
+      led_nums = 0; //reset Led nums
+      
+      g = g - 255/divisions;
+      if(r < 0){r = 0;}
+      b = b + 255/divisions;
+      if(g > 255){g = 255;}
+      if(dim == 1){
+        rb = r*brightness;
+        gb = g*brightness;
+        bb = b*brightness;
       }
-      for(i; i < led_nums; i++){
-        sendPixel(rb,gb,bb);
+      else{
+        rb = r;
+        gb = g;
+        bb = b;
+      }
+  
+      if( bin > base_line || test == 1){
+        led_nums = bin/base_reduce;
+        if(led_nums > col_len || test == 1){
+          led_nums = col_len;
+        }
+        for(i; i < led_nums; i++){
+          sendPixel(rb,gb,bb);
+          x += 1;
+          if(print_test == 1){
+            Serial.print("x : ");
+            Serial.print(x);
+            Serial.print("    i : ");
+            Serial.print(i);
+            Serial.print("    rgb : ");
+            Serial.print(r);
+            Serial.print(", ");
+            Serial.print(g);
+            Serial.print(", ");
+            Serial.println(b);
+          }
+          
+        }
+      }
+      for(i;i < col_len;i++){
+        sendPixel(5,5,5);
         x += 1;
-        if(print_test == 1){
+       if(print_test == 1){
           Serial.print("x : ");
           Serial.print(x);
           Serial.print("    i : ");
           Serial.print(i);
           Serial.print("    rgb : ");
-          Serial.print(r);
+          Serial.print(0);
           Serial.print(", ");
-          Serial.print(g);
+          Serial.print(0);
           Serial.print(", ");
-          Serial.println(b);
+          Serial.println(5);
         }
-        
       }
-    }
-    for(i;i < col_len;i++){
-      sendPixel(5,5,5);
-      x += 1;
-     if(print_test == 1){
+      
+    cbin += 1;
+    if(print_test == 1){
+        Serial.print("cbin : ");
+        Serial.println(cbin);
         Serial.print("x : ");
         Serial.print(x);
-        Serial.print("    i : ");
-        Serial.print(i);
-        Serial.print("    rgb : ");
-        Serial.print(0);
+        Serial.print("         i : ");
+        Serial.println(i);
+        Serial.print("LED NUM :");
+        Serial.println(led_nums);
+        Serial.print("Divisions : ");
+        Serial.println(divisions);
+        Serial.println((255/divisions)*cbin);
+        Serial.print(r);
         Serial.print(", ");
-        Serial.print(0);
+        Serial.print(g);
         Serial.print(", ");
-        Serial.println(5);
+        Serial.println(b);
+        Serial.println();
       }
-    }
-    
-  cbin += 1;
-  if(print_test == 1){
-      Serial.print("cbin : ");
-      Serial.println(cbin);
-      Serial.print("x : ");
-      Serial.print(x);
-      Serial.print("         i : ");
-      Serial.println(i);
-      Serial.print("LED NUM :");
-      Serial.println(led_nums);
-      Serial.print("Divisions : ");
-      Serial.println(divisions);
-      Serial.println((255/divisions)*cbin);
-      Serial.print(r);
-      Serial.print(", ");
-      Serial.print(g);
-      Serial.print(", ");
-      Serial.println(b);
-      Serial.println();
     }
   }
 }
