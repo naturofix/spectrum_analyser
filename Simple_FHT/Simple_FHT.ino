@@ -388,8 +388,8 @@ void loop() {
     if(print_test == 1){
       Serial.begin(9600);
     }
-    byte test = 1; //1 to turn all lights on, showing the rainbow disttribution
-    byte dim = 0; // 1 to dim all light, but the percentage in brightness
+    byte test = 0; //1 to turn all lights on, showing the rainbow disttribution
+    byte dim = 0; // 1 to dim all light, by the percentage in brightness
     byte baseline = 90;// threshold for triggering lights
     long_sa(print_test,test,dim,baseline);
     show();
