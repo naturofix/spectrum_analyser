@@ -384,11 +384,15 @@ void loop() {
 //      Serial.println(fht_log_out[i]); // send out the data
 //    }
 //  }
-
-    long_sa();
+    byte test = 1; //1 to turn all lights on, showing the rainbow disttribution
+    byte dim = 0; // 1 to dim all light, but the percentage in brightness
+    byte baseline = 90;// threshold for triggering lights
+    long_sa(test,dim,baseline);
     show();
     delay(1);
-    showColor(0, 0, 5);
+    if(test != 1){
+      showColor(0, 0, 5);
+    }
 }
 //  }
   
@@ -421,11 +425,9 @@ void first_try(){
 }
 
 
-void long_sa(){
-  byte test = 1;
-  byte dim = 0;
+void long_sa(byte test, byte dim,byte base_line){
+
   float brightness = 0.1; // 0 to 1
-  int base_line = 90; // threshold for triggering lights
   int base_reduce = 1; // divide internsity to trigger less lights
   int col_len = 900/(FHT_N/2); // number of lights per bin
   float led_nums = 0;
