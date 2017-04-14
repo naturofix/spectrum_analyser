@@ -4,6 +4,8 @@
 #include <FHT.h> // include the library
 
 #define PIXELS 300  // Number of pixels in the string
+
+
 // These values depend on which pin your string is connected to and what board you are using 
 // More info on how to find these at http://www.arduino.cc/en/Reference/PortManipulation
 
@@ -44,6 +46,9 @@
 
 // Actually send a bit to the string. We must to drop to asm to enusre that the complier does
 // not reorder things and make it so the delay happens in the wrong place.
+
+
+
 
 inline void sendBit( bool bitVal ) {
   
@@ -333,7 +338,7 @@ void detonate( unsigned char r , unsigned char g , unsigned char b , unsigned in
 }
 
 void setup() {
-   delay(3000);   
+  delay(3000);   
   ledsetup(); 
 
   Serial.begin(9600); // use the serial port
@@ -341,19 +346,22 @@ void setup() {
   ADCSRA = 0xe5; // set the adc to free running mode
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
-  showColor(0, 0, 0);
+  for(int i = 0,i < 10; i++){
+    showColor(0, 0, 0);
+    delay(3000);
+    showColor(25, 0, 0);
+    delay(3000);
+    showColor(0, 25, 0);
+    delay(3000);
+    showColor(0, 0, 25);
+    delay(3000);
+    showColor(0, 0, 0);
+    delay(3000);
+  }
 }
 
 
 void loop() {
-//    for(int f = 4; f < 16; f++){
-//    showColor(25, 0, 0); // Red
-//    delay(100);
-//    showColor(0, 25, 0); // Green
-//    delay(100);
-//    showColor(0, 0, 25); // Blue
-//    delay(100);
-//  }
   while(1) { // reduces jitter
     cli();  // UDRE interrupt slows this way down on arduino1.0
     for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
@@ -392,21 +400,21 @@ void first_try(){
   int base_line = 120;
   int base_led = 60;
     float led_nums = 0;
-    for(int f = 2; f < 16; f++){
-    int bin = fht_log_out[f];
-    if(bin>base_line-(f+2)){
-      led_nums = bin/5;
-      if(led_nums > 30){
-        led_nums = 30;
-      }
-      if(led_nums < 2){
-        led_nums = 0;
-      }
-      for(int i=0+(18*f); i<led_nums+(18*f); i++) {
-//        base_strip.setPixelColor(i,255-(16*f),16*f,0);
-        sendPixel(255-(16*f),16*f,0);
-
-//        sendPixel(r,g,b)
+    for(int f = 2; (f < FHT_N/2)/3; f++){ //third of bins from red to green
+      int bin = fht_log_out[f];
+      if(bin>base_line-(f+2)){
+        led_nums = bin/5;
+        if(led_nums > 30){
+          led_nums = 30;
+        }
+        if(led_nums < 2){
+          led_nums = 0;
+        }
+        for(int i=0+(18*f); i<led_nums+(18*f); i++) {
+  //        base_strip.setPixelColor(i,255-(16*f),16*f,0);
+          sendPixel(255-(16*f),16*f,0);
+  
+  //        sendPixel(r,g,b)
       }
     }
   }
@@ -415,11 +423,11 @@ void first_try(){
 
 void long_sa(){
   int brightness = 0.1; // 0 to 1
-  int base_line = 120;
-  int base_reduce = 5;
-  int col_len = 30;
+  int base_line = 120; // threshold for triggering lights
+  int base_reduce = 5; // divide internsity to trigger less lights
+  int col_len = 900/(FHT_N/2); // number of lights per bin
   float led_nums = 0;
-  byte divisions = 16;
+  byte divisions = (FHT_N/2)/3;
   float r = 255;
   float g = 0;
   float b = 0;
