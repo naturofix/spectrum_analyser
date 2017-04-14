@@ -1,9 +1,36 @@
 #define LOG_OUT 1 // use the log output function
+#define LIN_OUT 1 // use the lin output function
+
 #define FHT_N 256 // set to 256 point fht
 
 #include <FHT.h> // include the library
 
 #define PIXELS 900  // Number of pixels in the string
+
+
+static const uint8_t PROGMEM
+  // This is low-level noise that's subtracted from each FHT output column
+  // This was experimentally determined in a quiet room.
+  noise[128]={ 
+    50, 12, 10, 8, 7, 6, 6, 5, // 0
+    5, 5, 4, 4, 4, 4, 4, 4,    // 8
+    4, 4, 4, 4, 4, 4, 4, 4,    // 16
+    4, 4, 4, 4, 4, 4, 4, 4,    // 24
+    4, 4, 4, 4, 4, 4, 4, 4,    // 32
+    3, 3, 3, 4, 3, 3, 3, 3,    // 40
+    3, 3, 3, 3, 3, 3, 3, 3,    // 48    
+    3, 3, 3, 3, 3, 3, 3, 3,    // 56
+    3, 3, 3, 3, 3, 3, 3, 3,    // 64
+    3, 3, 3, 3, 3, 3, 3, 3,    // 72
+    3, 3, 3, 3, 3, 3, 3, 3,    // 80
+    3, 3, 3, 3, 3, 3, 3, 3,    // 88
+    3, 3, 3, 3, 3, 3, 3, 3,    // 96
+    3, 3, 3, 3, 3, 3, 3, 3,    // 104
+    3, 3, 3, 3, 3, 3, 3, 3,    // 112
+    3, 3, 3, 3, 3, 3, 3, 3     // 120
+};
+
+
 
 
 // These values depend on which pin your string is connected to and what board you are using 
@@ -377,30 +404,36 @@ void loop() {
     fht_window(); // window the data for better frequency response
     fht_reorder(); // reorder the data before doing the fht
     fht_run(); // process the data in the fht
-    fht_mag_log(); // take the output of the fht
+    char algo = "log";
+    if(algo == "log"){
+      fht_mag_log(); // take the output of the fht
+    }
+    if(algo == "lin"){
+      fht_mag_lin();
+    }
     sei();
 //    Serial.println("start");
 //    for (byte i = 0 ; i < FHT_N/2 ; i++) {
 //      Serial.println(fht_log_out[i]); // send out the data
 //    }
 //  }
-    byte print_test = 1; //1 to print variables
+    byte print_test = 0; //1 to print variables
     if(print_test == 1){
       Serial.begin(9600);
     }
-    byte colrange = 1; 
+    byte colrange = 7; 
     // 1 red to green
     // 2 green to blue
     // 3 red to green to blue
     
-    byte test = 1; //1 to turn all lights on, showing the rainbow disttribution
-    byte dim = 1; // 1 to dim all light, by the percentage in brightness
-    byte baseline = 120;// threshold for triggering lights
-    long_sa(colrange,print_test,test,dim,baseline);
+    byte test = 0; // 1 to turn all lights on, showing the rainbow disttribution
+    byte dim = 1; //  1 to dim all light, by the percentage in brightness
+    byte baseline = 10;// threshold for triggering lights
+    long_sa(colrange,print_test,test,dim,baseline,algo);
     show();
-    delay(1);
+    //delay(1);
     if(test != 1){
-      base_color();
+      showColor(0,0,0);
     }
 }
 //  }
@@ -411,14 +444,16 @@ void loop() {
 
 
 void base_color(){
-  showColor(0, 0, 0);
+  sendPixel(0, 0, 0);
+  return;
 }
 void first_try(){
-  int base_line = 120;
+  int base_line = 1;
   int base_led = 60;
     float led_nums = 0;
     for(int f = 2; (f < FHT_N/2)/3; f++){ //third of bins from red to green
-      int bin = fht_log_out[f];
+      //int bin = fht_log_out[f];
+      int bin = fht_lin_out[f];
       if(bin>base_line-(f+2)){
         led_nums = bin/5;
         if(led_nums > 30){
@@ -438,9 +473,9 @@ void first_try(){
 }
 
 
-void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line){
-
-  float brightness = 0.5; // 0 to 1
+void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,char algo){
+  int bin;
+  float brightness = 0.1; // 0 to 1
   int base_reduce = 1; // divide internsity to trigger less lights
   int col_len = 900/(FHT_N/2); // number of lights per bin
   float led_nums = 0;
@@ -448,16 +483,22 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
   float r = 255;
   float g = 0;
   float b = 0;
-  byte start = 1;
+  byte start = 0;
   int cbin = 0;
   int x = 0; //total number of leds
   int rb;
   int gb;
   int bb;
 
-  if(colrange == 1 || colrange ==3){
+  if(colrange == 1 || colrange == 3 || colrange ==7){
     for(byte f = start; f < start+divisions;f++){
-      int bin = fht_log_out[f]; //intensity of frequency
+      //int bin = fht_log_out[f]; //intensity of frequency
+      if(algo == "log"){
+        int bin = fht_log_out[f];
+      }
+      if(algo == "lin"){
+        int bin = fht_lin_out[f];
+      }
       int i = 0; 
       led_nums = 0; //reset Led nums
       r = r - 255/divisions;
@@ -475,7 +516,7 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
         bb = b;
       }
   
-      if( bin > base_line || test == 1){
+      if( bin > (noise[f] * baseline) || test == 1){
         led_nums = bin/base_reduce;
         if(led_nums > col_len || test == 1){
           led_nums = col_len;
@@ -500,6 +541,7 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
       }
       for(i;i < col_len;i++){
         base_color();
+        //sendPixel(0, 0, 5);
         x += 1;
        if(print_test == 1){
           Serial.print("x : ");
@@ -538,20 +580,26 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
     }
   }
 
-  if(colrange == 2 || colrange == 3){
+  if(colrange == 2 || colrange ==3 || colrange ==7){
   
     r = 0;
     g = 255;
     b = 0;
-    for(byte f = start+divisions; f < f + divisions;f++){
-      int bin = fht_log_out[f]; //intensity of frequency
+    byte g_start = start+divisions;
+    for(byte f = g_start; f < g_start + divisions;f++){
+      if(algo == "log"){
+        int bin = fht_log_out[f];
+      }
+      if(algo == "lin"){
+        int bin = fht_lin_out[f];
+      }
       int i = 0; 
       led_nums = 0; //reset Led nums
       
       g = g - 255/divisions;
-      if(r < 0){r = 0;}
+      if(g < 0){g = 0;}
       b = b + 255/divisions;
-      if(g > 255){g = 255;}
+      if(b > 255){b = 255;}
       if(dim == 1){
         rb = r*brightness;
         gb = g*brightness;
@@ -563,7 +611,7 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
         bb = b;
       }
   
-      if( bin > base_line || test == 1){
+      if( bin > noise[f] * baseline || test == 1){
         led_nums = bin/base_reduce;
         if(led_nums > col_len || test == 1){
           led_nums = col_len;
@@ -588,6 +636,7 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
       }
       for(i;i < col_len;i++){
         base_color();
+        //sendPixel(0, 0, 5);
         x += 1;
        if(print_test == 1){
           Serial.print("x : ");
@@ -625,6 +674,104 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte base_line)
       }
     }
   }
+
+
+
+  if(colrange == 4 || colrange == 7){
+  
+    r = 0;
+    g = 0;
+    b = 255;
+    byte b_start = start+divisions+divisions;
+    for(byte f = b_start; f < b_start + divisions;f++){
+      if(algo == "log"){
+        int bin = fht_log_out[f];
+      }
+      if(algo == "lin"){
+        int bin = fht_lin_out[f];
+      }
+      int i = 0; 
+      led_nums = 0; //reset Led nums
+      
+      b = b - 255/divisions;
+      if(b < 0){b = 0;}
+      r = r+ 255/divisions;
+      if(r > 255){r = 255;}
+      if(dim == 1){
+        rb = r*brightness;
+        gb = g*brightness;
+        bb = b*brightness;
+      }
+      else{
+        rb = r;
+        gb = g;
+        bb = b;
+      }
+  
+      if( bin > noise[f] * baseline || test == 1){
+        led_nums = bin/base_reduce;
+        if(led_nums > col_len || test == 1){
+          led_nums = col_len;
+        }
+        for(i; i < led_nums; i++){
+          sendPixel(rb,gb,bb);
+          x += 1;
+          if(print_test == 1){
+            Serial.print("x : ");
+            Serial.print(x);
+            Serial.print("    i : ");
+            Serial.print(i);
+            Serial.print("    rgb : ");
+            Serial.print(r);
+            Serial.print(", ");
+            Serial.print(g);
+            Serial.print(", ");
+            Serial.println(b);
+          }
+          
+        }
+      }
+      for(i;i < col_len;i++){
+        base_color();
+        //sendPixel(0, 0, 5);
+        x += 1;
+       if(print_test == 1){
+          Serial.print("x : ");
+          Serial.print(x);
+          Serial.print("    i : ");
+          Serial.print(i);
+          Serial.print("    rgb : ");
+          Serial.print(0);
+          Serial.print(", ");
+          Serial.print(0);
+          Serial.print(", ");
+          Serial.println(5);
+        }
+      }
+      
+    cbin += 1;
+    if(print_test == 1){
+        Serial.print("cbin : ");
+        Serial.println(cbin);
+        Serial.print("x : ");
+        Serial.print(x);
+        Serial.print("         i : ");
+        Serial.println(i);
+        Serial.print("LED NUM :");
+        Serial.println(led_nums);
+        Serial.print("Divisions : ");
+        Serial.println(divisions);
+        Serial.println((255/divisions)*cbin);
+        Serial.print(r);
+        Serial.print(", ");
+        Serial.print(g);
+        Serial.print(", ");
+        Serial.println(b);
+        Serial.println();
+      }
+    }
+  }
+  
 }
 
 

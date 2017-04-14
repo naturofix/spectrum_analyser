@@ -1,4 +1,6 @@
 #define LOG_OUT 1 // use the log output function
+#define LIN_OUT 1 // use the log output function
+
 #define FHT_N 256 // set to 256 point fht
 
 #include <FHT.h> // include the library
