@@ -423,6 +423,7 @@ void first_try(){
 
 void long_sa(){
   byte test = 1;
+  byte dim = 0;
   float brightness = 0.1; // 0 to 1
   int base_line = 90; // threshold for triggering lights
   int base_reduce = 1; // divide internsity to trigger less lights
@@ -435,6 +436,9 @@ void long_sa(){
   byte start = 0;
   int cbin = 0;
   int x = 0; //total number of leds
+  int rb;
+  int gb;
+  int bb;
   for(byte f = start; f < start+divisions;f++){
     int bin = fht_log_out[f]; //intensity of frequency
     int i = 0; 
@@ -443,13 +447,23 @@ void long_sa(){
     if(r < 0){r = 0;}
     g = g + (255/divisions)*cbin;
     if(g > 255){g = 255;}
+    if(dim == 1){
+      rb = r*brightness;
+      gb = g*brightness;
+      bb = b*brightness;
+    }
+    else{
+      rb = r;
+      gb = g;
+      bb = b;
+    }
     if( bin > base_line || test == 1){
       led_nums = bin/base_reduce;
       if(led_nums > col_len || test == 1){
         led_nums = col_len;
       }
       for(i; i < led_nums; i++){
-        sendPixel(r*brightness,g*brightness,b*brightness);
+        sendPixel(rb,gb,bb);
         x += 1;
       }
     }
