@@ -388,7 +388,7 @@ void loop() {
     if(print_test == 1){
       Serial.begin(9600);
     }
-    byte colrange = 2; 
+    byte colrange = 1; 
     // 1 red to green
     // 2 green to blue
     // 3 red to green to blue
