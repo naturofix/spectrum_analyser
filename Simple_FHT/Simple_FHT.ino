@@ -1,35 +1,11 @@
 #define LOG_OUT 1 // use the log output function
-#define LIN_OUT 1 // use the lin output function
+//#define LIN_OUT 1 // use the lin output function
 
-#define FHT_N 256 // set to 256 point fht
+#define FHT_N 128 // set to 256 point fht
 
 #include <FHT.h> // include the library
 
 #define PIXELS 900  // Number of pixels in the string
-
-
-static const uint8_t PROGMEM
-  // This is low-level noise that's subtracted from each FHT output column
-  // This was experimentally determined in a quiet room.
-  noise[128]={ 
-    50, 12, 10, 8, 7, 6, 6, 5, // 0
-    5, 5, 4, 4, 4, 4, 4, 4,    // 8
-    4, 4, 4, 4, 4, 4, 4, 4,    // 16
-    4, 4, 4, 4, 4, 4, 4, 4,    // 24
-    4, 4, 4, 4, 4, 4, 4, 4,    // 32
-    3, 3, 3, 4, 3, 3, 3, 3,    // 40
-    3, 3, 3, 3, 3, 3, 3, 3,    // 48    
-    3, 3, 3, 3, 3, 3, 3, 3,    // 56
-    3, 3, 3, 3, 3, 3, 3, 3,    // 64
-    3, 3, 3, 3, 3, 3, 3, 3,    // 72
-    3, 3, 3, 3, 3, 3, 3, 3,    // 80
-    3, 3, 3, 3, 3, 3, 3, 3,    // 88
-    3, 3, 3, 3, 3, 3, 3, 3,    // 96
-    3, 3, 3, 3, 3, 3, 3, 3,    // 104
-    3, 3, 3, 3, 3, 3, 3, 3,    // 112
-    3, 3, 3, 3, 3, 3, 3, 3     // 120
-};
-
 
 
 
@@ -368,83 +344,94 @@ void setup() {
   delay(3000);   
   ledsetup(); 
 
-  Serial.begin(9600); // use the serial port
+  //Serial.begin(9600); // use the serial port
   TIMSK0 = 0; // turn off timer0 for lower jitter
   ADCSRA = 0xe5; // set the adc to free running mode
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
-  for(int i = 0;i < 10; i++){
-    showColor(0, 0, 0);
-    delay(3000);
-    showColor(25, 0, 0);
-    delay(3000);
-    showColor(0, 25, 0);
-    delay(3000);
-    showColor(0, 0, 25);
-    delay(3000);
-    showColor(0, 0, 0);
-    delay(3000);
+  int run_test = 0;
+  if(run_test == 0){
+    for(int i = 0;i < 10; i++){
+      showColor(0, 0, 0);
+      delay(3000);
+      showColor(25, 0, 0);
+      delay(3000);
+      showColor(0, 25, 0);
+      delay(3000);
+      showColor(0, 0, 25);
+      delay(3000);
+      showColor(0, 0, 0);
+      delay(3000);
+    }
   }
 }
 
 
-void loop() {
-  while(1) { // reduces jitter
-    cli();  // UDRE interrupt slows this way down on arduino1.0
-    for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
-      while(!(ADCSRA & 0x10)); // wait for adc to be ready
-      ADCSRA = 0xf5; // restart adc
-      byte m = ADCL; // fetch adc data
-      byte j = ADCH;
-      int k = (j << 8) | m; // form into an int
-      k -= 0x0200; // form into a signed int
-      k <<= 6; // form into a 16b signed int
-      fht_input[i] = k; // put real data into bins
-    }
-    fht_window(); // window the data for better frequency response
-    fht_reorder(); // reorder the data before doing the fht
-    fht_run(); // process the data in the fht
-    char algo = "log";
-    if(algo == "log"){
-      fht_mag_log(); // take the output of the fht
-    }
-    if(algo == "lin"){
-      fht_mag_lin();
-    }
-    sei();
-//    Serial.println("start");
-//    for (byte i = 0 ; i < FHT_N/2 ; i++) {
-//      Serial.println(fht_log_out[i]); // send out the data
-//    }
-//  }
-    byte print_test = 0; //1 to print variables
-    if(print_test == 1){
-      Serial.begin(9600);
-    }
-    byte colrange = 7; 
-    // 1 red to green
-    // 2 green to blue
-    // 3 red to green to blue
+void loop(){
+  int run_fht = 1;
+  if(run_fht == 1){
     
-    byte test = 0; // 1 to turn all lights on, showing the rainbow disttribution
-    byte dim = 1; //  1 to dim all light, by the percentage in brightness
-    byte baseline = 10;// threshold for triggering lights
-    long_sa(colrange,print_test,test,dim,baseline,algo);
-    show();
-    //delay(1);
-    if(test != 1){
-      showColor(0,0,0);
-    }
-}
-//  }
+    while(1) { // reduces jitter
+      cli();  // UDRE interrupt slows this way down on arduino1.0
+      for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
+        while(!(ADCSRA & 0x10)); // wait for adc to be ready
+        ADCSRA = 0xf5; // restart adc
+        byte m = ADCL; // fetch adc data
+        byte j = ADCH;
+        int k = (j << 8) | m; // form into an int
+        k -= 0x0200; // form into a signed int
+        k <<= 6; // form into a 16b signed int
+        fht_input[i] = k; // put real data into bins
+      }
+      fht_window(); // window the data for better frequency response
+      fht_reorder(); // reorder the data before doing the fht
+      fht_run(); // process the data in the fht
   
+        fht_mag_log();
+  
+        //fht_mag_lin();
+  
+      sei();
+  //    Serial.println("start");
+  //    for (byte i = 0 ; i < FHT_N/2 ; i++) {
+  //      Serial.println(fht_log_out[i]); // send out the data
+  //    }
+  //  }
+      byte print_test = 0; 
+      //1 to print variables
+      //print bin
+      if(print_test == 1){
+        Serial.begin(9600);
+      }
+      byte colrange = 7; 
+      // 1 red to green
+      // 2 green to blue
+      // 3 red to green to blue
+      
+      byte test = 1; // 1 to turn all lights on, showing the rainbow disttribution
+      byte dim = 1; //  1 to dim all light, by the percentage in brightness
+      byte baseline = 60;// threshold for triggering lights
+      int reduce_noise = 0; //1 reduce noise
+      long_sa(colrange,print_test,test,dim,baseline,reduce_noise);
+      show();
+      delayMicroseconds(100);
+      if(test != 1){
+        showColor(0,0,0);
+      }
+      showColor(0,0,0);
+      //delayMicroseconds(100);
+    }
+  }
+//  }
+  //rainbowCycle(900,20,5);
+  //delay(10);
   return;
   
 }
 
 
 void base_color(){
-  sendPixel(0, 0, 0);
+  sendPixel(0, 0, 5);
   return;
 }
 void first_try(){
@@ -452,8 +439,8 @@ void first_try(){
   int base_led = 60;
     float led_nums = 0;
     for(int f = 2; (f < FHT_N/2)/3; f++){ //third of bins from red to green
-      //int bin = fht_log_out[f];
-      int bin = fht_lin_out[f];
+      int bin = fht_log_out[f];
+      //int bin = fht_lin_out[f];
       if(bin>base_line-(f+2)){
         led_nums = bin/5;
         if(led_nums > 30){
@@ -473,11 +460,32 @@ void first_try(){
 }
 
 
-void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,char algo){
+void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,int reduce_noise){
+
+int noise[128]={ 
+    20, 8, 6, 6, 6, 6, 6, 5, // 0
+    5, 5, 4, 4, 4, 4, 4, 4,    // 8
+    4, 4, 4, 4, 4, 4, 4, 4,    // 16
+    4, 4, 4, 4, 4, 4, 4, 4,    // 24
+    4, 4, 4, 4, 4, 4, 4, 4,    // 32
+    3, 3, 3, 4, 3, 3, 3, 3,    // 40
+    3, 3, 3, 3, 3, 3, 3, 3,    // 48    
+    3, 3, 3, 3, 3, 3, 3, 3,    // 56
+    3, 3, 3, 3, 3, 3, 3, 3,    // 64
+    3, 3, 3, 3, 3, 3, 3, 3,    // 72
+    3, 3, 3, 3, 3, 3, 3, 3,    // 80
+    3, 3, 3, 3, 3, 3, 3, 3,    // 88
+    3, 3, 3, 3, 3, 3, 3, 3,    // 96
+    3, 3, 3, 3, 3, 3, 3, 3,    // 104
+    3, 3, 3, 3, 3, 3, 3, 3,    // 112
+    3, 3, 3, 3, 3, 3, 3, 3     // 120
+};
+
+
   int bin;
-  float brightness = 0.1; // 0 to 1
+  float brightness = 0.25; // 0 to 1
   int base_reduce = 1; // divide internsity to trigger less lights
-  int col_len = 900/(FHT_N/2); // number of lights per bin
+  int col_len = 600/(FHT_N/2); // number of lights per bin
   float led_nums = 0;
   float divisions = (FHT_N/2)/3;
   float r = 255;
@@ -489,16 +497,17 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,c
   int rb;
   int gb;
   int bb;
+  int basement;
 
   if(colrange == 1 || colrange == 3 || colrange ==7){
     for(byte f = start; f < start+divisions;f++){
       //int bin = fht_log_out[f]; //intensity of frequency
-      if(algo == "log"){
+
         int bin = fht_log_out[f];
-      }
-      if(algo == "lin"){
-        int bin = fht_lin_out[f];
-      }
+
+//int bin = fht_lin_out[f];
+
+
       int i = 0; 
       led_nums = 0; //reset Led nums
       r = r - 255/divisions;
@@ -515,9 +524,16 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,c
         gb = g;
         bb = b;
       }
-  
-      if( bin > (noise[f] * baseline) || test == 1){
-        led_nums = bin/base_reduce;
+      basement = baseline;
+      if(reduce_noise == 1){
+        basement = noise[f] * baseline;
+      }
+      if(print_test == 2){
+        Serial.println(bin);
+        Serial.println(basement);
+      }
+      if( bin >  basement || test == 1){
+        led_nums = base_reduce;
         if(led_nums > col_len || test == 1){
           led_nums = col_len;
         }
@@ -559,6 +575,10 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,c
       
     cbin += 1;
     if(print_test == 1){
+        Serial.print("f : ");
+        Serial.print(f);
+        Serial.print("     bin :");
+        Serial.print(bin);
         Serial.print("cbin : ");
         Serial.println(cbin);
         Serial.print("x : ");
@@ -587,12 +607,11 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,c
     b = 0;
     byte g_start = start+divisions;
     for(byte f = g_start; f < g_start + divisions;f++){
-      if(algo == "log"){
+
         int bin = fht_log_out[f];
-      }
-      if(algo == "lin"){
-        int bin = fht_lin_out[f];
-      }
+
+      //  int bin = fht_lin_out[f];
+
       int i = 0; 
       led_nums = 0; //reset Led nums
       
@@ -610,8 +629,15 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,c
         gb = g;
         bb = b;
       }
-  
-      if( bin > noise[f] * baseline || test == 1){
+      basement = baseline;
+      if(reduce_noise == 1){
+        basement = noise[f] * baseline;
+      }
+      if(print_test == 2){
+        Serial.println(bin);
+        Serial.println(basement);
+      }
+      if( bin >  basement || test == 1){
         led_nums = bin/base_reduce;
         if(led_nums > col_len || test == 1){
           led_nums = col_len;
@@ -654,6 +680,10 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,c
       
     cbin += 1;
     if(print_test == 1){
+        Serial.print("f : ");
+        Serial.print(f);
+        Serial.print("     bin :");
+        Serial.println(bin);
         Serial.print("cbin : ");
         Serial.println(cbin);
         Serial.print("x : ");
@@ -684,11 +714,12 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,c
     b = 255;
     byte b_start = start+divisions+divisions;
     for(byte f = b_start; f < b_start + divisions;f++){
-      if(algo == "log"){
+
         int bin = fht_log_out[f];
-      }
-      if(algo == "lin"){
-        int bin = fht_lin_out[f];
+//int bin = fht_lin_out[f];
+
+      if(print_test == 2){
+        Serial.println(bin);
       }
       int i = 0; 
       led_nums = 0; //reset Led nums
@@ -707,8 +738,15 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,c
         gb = g;
         bb = b;
       }
-  
-      if( bin > noise[f] * baseline || test == 1){
+      basement = baseline;
+      if(reduce_noise == 1){
+        basement = noise[f] * baseline;
+      }
+      if(print_test == 2){
+        Serial.println(bin);
+        Serial.println(basement);
+      }
+      if( bin >  basement || test == 1){
         led_nums = bin/base_reduce;
         if(led_nums > col_len || test == 1){
           led_nums = col_len;
@@ -751,6 +789,10 @@ void long_sa(byte colrange, byte print_test, byte test, byte dim,byte baseline,c
       
     cbin += 1;
     if(print_test == 1){
+        Serial.print("f : ");
+        Serial.print(f);
+        Serial.print("     bin :");
+        Serial.print(bin);
         Serial.print("cbin : ");
         Serial.println(cbin);
         Serial.print("x : ");
