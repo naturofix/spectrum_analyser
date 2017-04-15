@@ -143,11 +143,11 @@ void loop() {
 //    L = (pgm_read_byte(&noise[x]) << 6);
 //    fht_lin_out[x] = (fht_lin_out[x] <= L) ? 0 : (fht_lin_out[x] - L);
   }
-  for(int i = 0;i < 5;i++){
-    Serial.print(fht_lin_out[i]);
-    Serial.print(", ");
-  }
-  Serial.println();
+//  for(int i = 0;i < 5;i++){
+//    Serial.print(fht_lin_out[i]);
+//    Serial.print(", ");
+//  }
+//  Serial.println();
   
   fht_lin_out[1] = (fht_lin_out[1] <= 500) ? 0 : (fht_lin_out[1] - 400);
   

@@ -1,3 +1,5 @@
+#include <WS2812.h>
+
 
 /*
  This is an example of how simple driving a Neopixel can be
